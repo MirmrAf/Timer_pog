@@ -196,21 +196,7 @@ namespace Timer_pog
             if (counter == all_time)
             {
 
-                timer_is_stoped = true;
-                timer1.Stop();
-                timer1 = null;
-                seconds_mtb.Clear();
-                minutes_mtb.Clear();
-                hours_mtb.Clear();
-                Debug.Write("Time has passed");
-                //LockWorkStation();
-                InSim.Keyboard.KeyPress(SelectedKeyCode);
-                timer_label.Text = "time: 0:0:0";
-                AllOk?.Play();
-                counter = 0;
-                s = 0;
-                m = 0;
-                h = 0;
+                stopAndPress_timer();
                 MessageBox.Show("Time has passed", "COMPLETED", MessageBoxButtons.OKCancel, MessageBoxIcon.None);
             }
         }
@@ -219,25 +205,13 @@ namespace Timer_pog
         {
             if (timer_is_stoped == false)
             {
-
-                timer_is_stoped = true;
-                timer1.Stop();
-                timer1 = null;
-                seconds_mtb.Clear();
-                minutes_mtb.Clear();
-                hours_mtb.Clear();
-                Debug.Write("stop");
-                timer_label.Text = "time: 0:0:0";
-                AllOk?.Play();
-                counter = 0;
-                s = 0;
-                m = 0;
-                h = 0;
+                stop_timer();
                 MessageBox.Show("Timer is stopped", "STOP", MessageBoxButtons.OKCancel, MessageBoxIcon.None);
 
             }
             else
             {
+                stop_timer();
                 Bad?.Play();
                 MessageBox.Show("Time is alredy stopped", "STOP", MessageBoxButtons.OKCancel, MessageBoxIcon.None);
             }
@@ -260,7 +234,40 @@ namespace Timer_pog
             }
 
         }
-
+        private void stop_timer()
+        {
+            timer_is_stoped = true;
+            timer1.Stop();
+            timer1 = null;
+            seconds_mtb.Clear();
+            minutes_mtb.Clear();
+            hours_mtb.Clear();
+            Debug.Write("stop");
+            timer_label.Text = "time: 0:0:0";
+            AllOk?.Play();
+            counter = 0;
+            s = 0;
+            m = 0;
+            h = 0;
+        }
+        private void stopAndPress_timer()
+        {
+            timer_is_stoped = true;
+            timer1.Stop();
+            timer1 = null;
+            seconds_mtb.Clear();
+            minutes_mtb.Clear();
+            hours_mtb.Clear();
+            Debug.Write("Time has passed");
+            //LockWorkStation();
+            InSim.Keyboard.KeyPress(SelectedKeyCode);
+            timer_label.Text = "time: 0:0:0";
+            AllOk?.Play();
+            counter = 0;
+            s = 0;
+            m = 0;
+            h = 0;
+        }
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelectedKeyCode = (VirtualKeyCode)comboBox1.SelectedItem;
