@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using WindowsInput;
-using WindowsInput.Native;
+
+using AutoHotkey.Interop;
+
 
 
 namespace Timer_pog
@@ -26,23 +27,28 @@ namespace Timer_pog
         SoundPlayer Bad;
         int counter = 0;
         bool timer_is_stoped = true;
-        InputSimulator InSim = new InputSimulator();
+        AutoHotkeyEngine ahk = AutoHotkeyEngine.Instance;
+        //InputSimulator InSim = new InputSimulator();
         System.Windows.Forms.Timer timer1;
-        VirtualKeyCode SelectedKeyCode;
+        //VirtualKeyCode SelectedKeyCode;
+        bool cycle = false;
+        int cycle_count = 0;
+
 
         [DllImport("user32.dll")]
         public static extern void LockWorkStation();
 
         public LogOutTimer()
         {
+
             InitializeComponent();
-            for (int i = 0; i < 200; i++) 
+           /* for (int i = 0; i < 200; i++)
             {
                 FillComboBoxWithFilteredKeys();
-            }
+            }*/
 
         }
-        private void FillComboBoxWithFilteredKeys()
+     /*   private void FillComboBoxWithFilteredKeys()
         {
             // Исключаем некоторые значения, которые обычно не нужны
             var excludedKeys = new[]
@@ -100,15 +106,15 @@ namespace Timer_pog
             {
                 comboBox1.Items.Add(keyCode);
             }
-            
+
             comboBox1.SelectedIndex = 24;
             SelectedKeyCode = (VirtualKeyCode)comboBox1.SelectedItem;
 
-        }
+        }*/
 
         private void hours_mtb_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
         {
-            
+
         }
 
         private void start_button_Click(object sender, EventArgs e)
@@ -124,18 +130,21 @@ namespace Timer_pog
                     try
                     {
                         seconds = int.Parse(seconds_mtb.Text);
+
                         okay_s = true;
                     }
                     catch { okay_s = false; }
                     try
                     {
                         minutes = int.Parse(minutes_mtb.Text);
+
                         okay_m = true;
                     }
                     catch { okay_m = false; }
                     try
                     {
                         hours = int.Parse(hours_mtb.Text);
+
                         okay_h = true;
                     }
                     catch { okay_h = false; }
@@ -180,7 +189,7 @@ namespace Timer_pog
         void timer_tick(object sender, EventArgs e)
         {
 
-            Debug.WriteLine(all_time);
+            //Debug.WriteLine(all_time);
             counter++;
             s++;
             if (s >= 59)
@@ -188,16 +197,20 @@ namespace Timer_pog
                 s = 0;
                 m++;
             }
-            if (m == 59)
+            if (m >= 59)
             {
+                m = 0;
                 h++;
             }
-            timer_label.Text = $"time: {h}:{m}:{s}";
+            timer_label.Text = $"time: {h.ToString("#00")}:{m.ToString("#00")}:{s.ToString("#00")}";
             if (counter == all_time)
             {
 
                 stopAndPress_timer();
-                MessageBox.Show("Time has passed", "COMPLETED", MessageBoxButtons.OKCancel, MessageBoxIcon.None);
+                if (!cycle)
+                {
+                    MessageBox.Show("Time has passed", "COMPLETED", MessageBoxButtons.OKCancel, MessageBoxIcon.None);
+                }
             }
         }
 
@@ -237,13 +250,13 @@ namespace Timer_pog
         private void stop_timer()
         {
             timer_is_stoped = true;
-            timer1.Stop();
+            timer1?.Stop();
             timer1 = null;
             seconds_mtb.Clear();
             minutes_mtb.Clear();
             hours_mtb.Clear();
             Debug.Write("stop");
-            timer_label.Text = "time: 0:0:0";
+            timer_label.Text = "time: 00:00:00";
             AllOk?.Play();
             counter = 0;
             s = 0;
@@ -252,7 +265,14 @@ namespace Timer_pog
         }
         private void stopAndPress_timer()
         {
-            timer_is_stoped = true;
+            if (cycle)
+            {
+                timer_is_stoped = false;
+            }
+            else{
+                timer_is_stoped = true;
+            }
+            
             timer1.Stop();
             timer1 = null;
             seconds_mtb.Clear();
@@ -260,17 +280,71 @@ namespace Timer_pog
             hours_mtb.Clear();
             Debug.Write("Time has passed");
             //LockWorkStation();
-            InSim.Keyboard.KeyPress(SelectedKeyCode);
-            timer_label.Text = "time: 0:0:0";
+            if (cycle == true && cycle_count % 2 == 0)
+            {
+                if (cycle_count != 0)
+                {
+                    ahk.ExecRaw("SendInput, {f2 down}" +
+                                "Sleep, 100" +
+                                "SendInput, {f2 up}");
+                    Thread.Sleep(6000);
+                    ahk.ExecRaw(
+                                "SendInput, {f4 down}" +
+                                "Sleep, 100" +
+                                "SendInput, {f4 up}");
+                }
+                else
+                {
+                    ahk.ExecRaw(
+                                "SendInput, {f4 down}" +
+                                "Sleep, 100" +
+                                "SendInput, {f4 up}");
+                }
+            }
+            else if (cycle == true && cycle_count % 2 != 0) 
+            {
+                ahk.ExecRaw("SendInput, {f6 down}" +
+                            "Sleep, 100" +
+                            "SendInput, {f6 up}");
+                Thread.Sleep(6000);
+                ahk.ExecRaw(
+                            "SendInput, {f8 down}" +
+                            "Sleep, 100" +
+                            "SendInput, {f8 up}");
+            }
+
+
+                //InSim.Keyboard.KeyPress(SelectedKeyCode);
+                timer_label.Text = $"time: 00:00:00";
             AllOk?.Play();
             counter = 0;
             s = 0;
             m = 0;
             h = 0;
+            if (cycle)
+            {
+                cycle_count++;
+                timer1 = new System.Windows.Forms.Timer();
+                timer1.Interval = 1000; // Установите интервал в 1000 миллисекунд (1 секунда)
+                timer1.Tick += timer_tick;
+                timer1.Start();
+            }
         }
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SelectedKeyCode = (VirtualKeyCode)comboBox1.SelectedItem;
+           // SelectedKeyCode = (VirtualKeyCode)comboBox1.SelectedItem;
+        }
+
+        private void CycleBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (CycleBox.Checked)
+            {
+                cycle = true;
+            }
+            else
+            {
+                cycle = false;
+            }
         }
     }
 }

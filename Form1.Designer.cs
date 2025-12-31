@@ -41,6 +41,7 @@
             checkBox1 = new CheckBox();
             comboBox1 = new ComboBox();
             label4 = new Label();
+            CycleBox = new CheckBox();
             SuspendLayout();
             // 
             // timer_label
@@ -50,7 +51,7 @@
             timer_label.Name = "timer_label";
             timer_label.Size = new Size(257, 36);
             timer_label.TabIndex = 0;
-            timer_label.Text = "time: 0:0:0";
+            timer_label.Text = "time: 00:00:00";
             // 
             // hours_mtb
             // 
@@ -145,6 +146,7 @@
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(121, 23);
             comboBox1.TabIndex = 10;
+            comboBox1.Visible = false;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // label4
@@ -155,12 +157,25 @@
             label4.Size = new Size(59, 15);
             label4.TabIndex = 11;
             label4.Text = "Key select";
+            label4.Visible = false;
+            // 
+            // CycleBox
+            // 
+            CycleBox.AutoSize = true;
+            CycleBox.Location = new Point(220, 86);
+            CycleBox.Name = "CycleBox";
+            CycleBox.Size = new Size(60, 19);
+            CycleBox.TabIndex = 12;
+            CycleBox.Text = "Cycle?";
+            CycleBox.UseVisualStyleBackColor = true;
+            CycleBox.CheckedChanged += CycleBox_CheckedChanged;
             // 
             // LogOutTimer
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(304, 161);
+            Controls.Add(CycleBox);
             Controls.Add(label4);
             Controls.Add(comboBox1);
             Controls.Add(checkBox1);
@@ -198,5 +213,6 @@
         private CheckBox checkBox1;
         private ComboBox comboBox1;
         private Label label4;
+        private CheckBox CycleBox;
     }
 }
